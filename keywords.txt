@@ -1,0 +1,50 @@
+#######################################
+# Syntax Coloring Map for Flash
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+MMB	KEYWORD1
+MMBJsonParser	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+setAccountName	KEYWORD2
+setAPIName	KEYWORD2
+run	KEYWORD2
+available	KEYWORD2
+read	KEYWORD2
+close	KEYWORD2
+addQueryStringParameter	KEYWORD2
+addUriTemplateParameter	KEYWORD2
+addXWWWFormUrlencodedParameter	KEYWORD2
+
+parseJson	KEYWORD2
+getStatusCode	KEYWORD2
+getData	KEYWORD2
+addCharacter	KEYWORD2
+success	KEYWORD2
+
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+MMBJSON_USERNAME_NOT_FOUND	LITERAL1
+MMBJSON_API_NOT_FOUND	LITERAL1
+MMBJSON_PARAMETER_NOT_FOUND	LITERAL1
+MMBJSON_OK	LITERAL1
+MMBJSON_HTTPS_CALL_NOT_ALLOWED	LITERAL1
+MMBJSON_DAILY_API_CALLS_LIMIT_EXCEEDED	LITERAL1
+MMBJSON_HOURLY_API_CALLS_LIMIT_EXCEEDED	LITERAL1
+MMBJSON_DATA_LIMIT_EXCEEDED	LITERAL1
+MMBJSON_API_CALLS_MUST_BE_PERFORMED_UNDER_HTTPS	LITERAL1
+MMBJSON_INTERNAL_SERVICE_ERROR	LITERAL1
+MMBJSON_INTERNAL_SERVER_ERROR	LITERAL1
+MMBJSON_INTERNAL_SOURCE_ERROR	LITERAL1
+MMBJSON_INTERNAL_RESPONSE_FORMAT_ERROR	LITERAL1
+
