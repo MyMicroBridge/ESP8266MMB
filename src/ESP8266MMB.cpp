@@ -221,6 +221,7 @@ void ESP8266MMB::addXWWWFormUrlencodedParameter(const char *offset, const char *
 // void ESP8266MMB::close() {
 // 	return _http.stop();
 // }
+
 String ESP8266MMB::getResponse() {
 	return _http.getString();
 }
@@ -292,7 +293,10 @@ int ESP8266MMB::execute(char *url) {
 		//ricopio il body in un array di uint8_t
 		uint8_t payload_uint8_t[strlen(_xWWWFormUrlencoded)];
 		memcpy(payload_uint8_t, _xWWWFormUrlencoded, strlen(_xWWWFormUrlencoded));
-        
+        	
+        //HEADER ContentType
+        _http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+
         //---CHIAMATA POST
 		httpCode = _http.POST(payload_uint8_t, strlen(_xWWWFormUrlencoded));
 

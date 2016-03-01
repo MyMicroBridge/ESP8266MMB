@@ -19,7 +19,7 @@
 
 //---INTERNAL CONFIGURATION
 //debug
-#define DEBUG 1
+//#define DEBUG 1
 
 #define MMB_API_HOSTNAME "api.mymicrobridge.com" //hostname API endpoint
 #define MMB_API_PORT 80 //port API endpoint

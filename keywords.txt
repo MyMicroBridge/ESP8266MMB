@@ -6,8 +6,8 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-MMB	KEYWORD1
-MMBJsonParser	KEYWORD1
+ESP8266MMB	KEYWORD1
+ESP8266MMBJsonParser	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -16,9 +16,7 @@ MMBJsonParser	KEYWORD1
 setAccountName	KEYWORD2
 setAPIName	KEYWORD2
 run	KEYWORD2
-available	KEYWORD2
-read	KEYWORD2
-close	KEYWORD2
+getResponse	KEYWORD2
 addQueryStringParameter	KEYWORD2
 addUriTemplateParameter	KEYWORD2
 addXWWWFormUrlencodedParameter	KEYWORD2
@@ -33,6 +31,12 @@ success	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+MMB_HTTP_SUCCESS	LITERAL1
+MMB_HTTP_ERROR	LITERAL1
+
+MMBJSON_PARSE_SUCCESS	LITERAL1
+MMBJSON_PARSE_ERROR	LITERAL1
 
 MMBJSON_USERNAME_NOT_FOUND	LITERAL1
 MMBJSON_API_NOT_FOUND	LITERAL1
