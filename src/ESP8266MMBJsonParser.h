@@ -51,7 +51,7 @@
 //debug
 //#define DEBUG 1
 	
-#define JSON_MESSAGE_INITIAL_SIZE 130
+#define JSON_MESSAGE_INITIAL_SIZE 200
 
 
 //definisco gli errori

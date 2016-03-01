@@ -73,12 +73,7 @@ void setup()
   mmb.setAPIName(MMB_API_NAME);
 
   //set API parameter
-  //mmb.addQueryStringParameter("city", "Ceggia");
-  mmb.addXWWWFormUrlencodedParameter("city", "Ceggia");
-
-  //---DEBUG
-  mmb.printDataDebug();
-  //---DEBUG
+  mmb.addQueryStringParameter("city", "Ceggia");
   
   //run
   if (mmb.run()) { //se la chiamata ha avuto successo

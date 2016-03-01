@@ -106,9 +106,7 @@ JsonVariant ESP8266MMBJsonParser::getErrors(int index, const char * nspace) {
 
 //---ADD FUNCTION
 void ESP8266MMBJsonParser::addCharacter(char c) {
-
-	Serial.print(c);
-
+	
 	if (c == '\"') {
 		_openQuotes = !_openQuotes;
 	}
