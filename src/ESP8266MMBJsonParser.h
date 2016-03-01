@@ -13,6 +13,10 @@
 #include "Arduino.h"
 #include <ArduinoJson.h>
 
+//PARSING CODE
+#define MMBJSON_PARSE_SUCCESS 1
+#define MMBJSON_PARSE_ERROR 0
+
 
 //---STATUS CODE
 //bad request 1xx
@@ -45,7 +49,7 @@
 
 //---INTERNAL CONFIGURATION
 //debug
-//#define DEBUG 1
+#define DEBUG 1
 	
 #define JSON_MESSAGE_INITIAL_SIZE 130
 
@@ -63,17 +67,17 @@ class ESP8266MMBJsonParser {
 
 
 		//---PASE FUNCTION
-		void parseJson(char *message);
+		void parseJson(const char *message);
 		void parseJson(String message);
 		void parseJson();
 
 		//---GET FUNCTION
 		int getStatusCode();
 
-		JsonVariant getData(char *key);
-		JsonVariant getData(char *key, char *nspace);
+		JsonVariant getData(const char *key);
+		JsonVariant getData(const char *key, const char *nspace);
 
-		JsonVariant getErrors(int index, char *nspace);
+		JsonVariant getErrors(int index, const char *nspace);
 
 		//---ADD CHARACTER
 		void addCharacter(char c);
@@ -91,7 +95,7 @@ class ESP8266MMBJsonParser {
 		uint8_t _openQuotes; //indica se è stato trovato il carattere"
 
 		//buffer Json
-		StaticJsonBuffer<200> _jsonBuffer;
+		StaticJsonBuffer<500> _jsonBuffer;
 
 		//json object
 		JsonObject *_json;

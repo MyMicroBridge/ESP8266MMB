@@ -14,8 +14,8 @@
 
 
 //HTTP CODE
-#define MMB_HTTP_SUCCESS 0
-#define MMB_HTTP_ERROR -1
+#define MMB_HTTP_SUCCESS 1
+#define MMB_HTTP_ERROR 0
 
 //---INTERNAL CONFIGURATION
 //debug

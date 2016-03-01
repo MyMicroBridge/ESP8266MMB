@@ -21,7 +21,7 @@ ESP8266MMBJsonParser::ESP8266MMBJsonParser(int dim) {
 	_openQuotes = 0;
 
 	//inizializzo il siccesso del parsing a 0
-	_parseSuccess = 0; //ci sono errori
+	_parseSuccess = MMBJSON_PARSE_ERROR; //ci sono errori
 }
 
 //destroyer
@@ -31,63 +31,32 @@ ESP8266MMBJsonParser::~ESP8266MMBJsonParser() {
 
 
 //---PARSE FUNCTION
-void ESP8266MMBJsonParser::parseJson(char *message) { //devono essere già stati eliminati \n \t e spazi
+void ESP8266MMBJsonParser::parseJson(const char *message) { //devono essere già stati eliminati \n \t e spazi
 	
-	#ifdef DEBUG
-		debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
-		debugPrint(message);
-	#endif
-
-	strcpy(_jsonMessage, message);
-
-	//creo json object
-	_json = &_jsonBuffer.parseObject(_jsonMessage);
-
-
-	if (!(*_json).success()) {
-		#ifdef DEBUG
-			debugPrint(F("_json parseObject() failed\n"));
-		#endif
-
-		_parseSuccess = 0;
-
-	} else {
-		_parseSuccess = 1;
+	//inserisco tutti i caratteri nel buffer interno
+	for (int i = 0; i < strlen(message); i++) {
+		addCharacter(message[i]);
 	}
+
+	//inserisco il terminatore
+	addCharacter('\0');
+
+	//eseguo il parsing
+	parseJson();
 }
 
 void ESP8266MMBJsonParser::parseJson(String message) { //elimino \n \t e spazi
 	
-	message.replace("\n", "");
-	message.replace("\t", "");
-	message.replace(" ", "");
-
-	#ifdef DEBUG
-		debugPrint(F("\n\n---MESSAGE TO PARSE---\n\n"));
-		debugPrint(message);
-	#endif
-
-
-
-	message.toCharArray(_jsonMessage, JSON_MESSAGE_INITIAL_SIZE);
-
-	//strcpy(_jsonMessage, message);
-	//strcat(_jsonMessage, "\0");
-
-	//creo json object
-	_json = &_jsonBuffer.parseObject(_jsonMessage);
-
-
-	if (!(*_json).success()) {
-		#ifdef DEBUG
-			debugPrint(F("_json parseObject() failed\n"));
-		#endif
-		
-		_parseSuccess = 0;
-
-	} else {
-		_parseSuccess = 1;
+	//inserisco tutti i caratteri nel buffer interno
+	for (int i = 0; i < message.length(); i++) {
+		addCharacter(message.charAt(i));
 	}
+
+	//inserisco il terminatore
+	addCharacter('\0');
+
+	//eseguo il parsing
+	parseJson();
 }
 
 void ESP8266MMBJsonParser::parseJson() { //elimino \n \t e spazi
@@ -100,16 +69,18 @@ void ESP8266MMBJsonParser::parseJson() { //elimino \n \t e spazi
 	//creo json object
 	_json = &_jsonBuffer.parseObject(_jsonMessage);
 
-
-	if (!(*_json).success()) {
+	if (_json->success()) {
 		#ifdef DEBUG
-			debugPrint(F("_json parseObject() failed\n"));
+			debugPrint(F("\nPARSE SUCCESS\n"));
 		#endif
-		
-		_parseSuccess = 0;
+		_parseSuccess = MMBJSON_PARSE_SUCCESS;
 
 	} else {
-		_parseSuccess = 1;
+		#ifdef DEBUG
+			debugPrint(F("\nPARSE ERROR\n"));
+		#endif
+		
+		_parseSuccess = MMBJSON_PARSE_ERROR;
 	}
 }
 
@@ -119,15 +90,15 @@ int ESP8266MMBJsonParser::getStatusCode() {
 	return (*_json)["responses"][0]["status"]["code"];
 }
 
-JsonVariant ESP8266MMBJsonParser::getData(char *key) {
+JsonVariant ESP8266MMBJsonParser::getData(const char *key) {
 	return getData(key, "default");
 }
 
-JsonVariant ESP8266MMBJsonParser::getData(char *key, char *nspace) {
+JsonVariant ESP8266MMBJsonParser::getData(const char *key, const char *nspace) {
 	return (*_json)["responses"][0]["data"][nspace][key];
 }
 
-JsonVariant ESP8266MMBJsonParser::getErrors(int index, char * nspace) {
+JsonVariant ESP8266MMBJsonParser::getErrors(int index, const char * nspace) {
 	return (*_json)["responses"][0]["errors"][nspace][index];
 }
 
@@ -135,6 +106,8 @@ JsonVariant ESP8266MMBJsonParser::getErrors(int index, char * nspace) {
 
 //---ADD FUNCTION
 void ESP8266MMBJsonParser::addCharacter(char c) {
+
+	Serial.print(c);
 
 	if (c == '\"') {
 		_openQuotes = !_openQuotes;
