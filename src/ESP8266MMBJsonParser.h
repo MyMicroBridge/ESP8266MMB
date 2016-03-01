@@ -1,6 +1,10 @@
 /*
 	MMBJsonParser Library
 
+	MANCA GESTIONE ERRORI
+
+	- ERRORE NEL PARSING DI STRING E CHAR ARRAY
+
 */
 
 #ifndef MMBJSONPARSER_H
@@ -9,10 +13,6 @@
 #include "Arduino.h"
 #include <ArduinoJson.h>
 
-//debug
-//#define DEBUG 1
-	
-#define JSON_MESSAGE_INITIAL_SIZE 130
 
 //---STATUS CODE
 //bad request 1xx
@@ -41,6 +41,13 @@
 
 //response error 7xx
 #define MMBJSON_INTERNAL_RESPONSE_FORMAT_ERROR 700
+
+
+//---INTERNAL CONFIGURATION
+//debug
+//#define DEBUG 1
+	
+#define JSON_MESSAGE_INITIAL_SIZE 130
 
 
 //definisco gli errori

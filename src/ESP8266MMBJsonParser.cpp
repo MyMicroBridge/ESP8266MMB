@@ -5,7 +5,7 @@
 //---PUBLIC---
 
 //costruttore
-ESP8266MMBJsonParser::ESP8266MMBJsonParser():MMBJsonParser(JSON_MESSAGE_INITIAL_SIZE) {}
+ESP8266MMBJsonParser::ESP8266MMBJsonParser():ESP8266MMBJsonParser(JSON_MESSAGE_INITIAL_SIZE) {}
 
 ESP8266MMBJsonParser::ESP8266MMBJsonParser(int dim) {
 

@@ -4,10 +4,10 @@
 
 //---PUBLIC---
 
-ESP8266MMB::ESP8266MMB(Client& client): MMB(client, ACCOUNT_NAME_INITIAL_SIZE, API_NAME_INITIAL_SIZE, QUERY_STRING_INITIAL_SIZE, URI_TEMPLATE_INITIAL_SIZE, X_WWW_FORM_URLENCODED_INITIAL_SIZE) {}
+ESP8266MMB::ESP8266MMB(): ESP8266MMB(ACCOUNT_NAME_INITIAL_SIZE, API_NAME_INITIAL_SIZE, QUERY_STRING_INITIAL_SIZE, URI_TEMPLATE_INITIAL_SIZE, X_WWW_FORM_URLENCODED_INITIAL_SIZE) {}
 
 //costructor and create _http client
-ESP8266MMB::ESP8266MMB(Client& client, int accountNameBufferSize, int apiNameBufferSize, int queryStringBufferSize, int uriTemplateBufferSize, int xWWWFormUrlencodedBufferSize): _http(client) {
+ESP8266MMB::ESP8266MMB(int accountNameBufferSize, int apiNameBufferSize, int queryStringBufferSize, int uriTemplateBufferSize, int xWWWFormUrlencodedBufferSize) {
 
 	//inizializzo i buffer
 
@@ -50,7 +50,7 @@ ESP8266MMB::~ESP8266MMB() {
 }
 
 //---SET FUNZIONI INIZIALI
-void ESP8266MMB::setAccountName(char *account) { //account name
+void ESP8266MMB::setAccountName(const char *account) { //account name
 
 	#ifdef DEBUG
 		debugPrint(F("\n SIZE OF _accountName: "));
@@ -71,7 +71,7 @@ void ESP8266MMB::setAccountName(char *account) { //account name
 
 }
 
-void ESP8266MMB::setAPIName(char *api) { //api name
+void ESP8266MMB::setAPIName(const char *api) { //api name
 
 	#ifdef DEBUG
 		debugPrint(F("\n SIZE OF _apiName: "));
@@ -92,7 +92,7 @@ void ESP8266MMB::setAPIName(char *api) { //api name
 }
 
 //---AGGIUNTA PARAMETRI API
-void ESP8266MMB::addQueryStringParameter(char *offset, char *value) { //query string
+void ESP8266MMB::addQueryStringParameter(const char *offset, const char *value) { //query string
 
 	if (_queryString[0] == 0) { //se query string è vuota
 
@@ -130,7 +130,7 @@ void ESP8266MMB::addQueryStringParameter(char *offset, char *value) { //query st
 
 }
 
-void ESP8266MMB::addUriTemplateParameter(char *value) { //uri template //DEVONO ESSERE INSERITI IN ORDINE
+void ESP8266MMB::addUriTemplateParameter(const char *value) { //uri template //DEVONO ESSERE INSERITI IN ORDINE
 
 	if (_uriTemplate[0] == 0) { //se query string è vuota
 
@@ -172,7 +172,7 @@ void ESP8266MMB::addUriTemplateParameter(char *value) { //uri template //DEVONO 
 	
 }
 
-void ESP8266MMB::addXWWWFormUrlencodedParameter(char *offset, char *value) { //x-www-form-urlencoded
+void ESP8266MMB::addXWWWFormUrlencodedParameter(const char *offset, const char *value) { //x-www-form-urlencoded
 
 	if (_xWWWFormUrlencoded[0] == 0) { //se query string è vuota
 
@@ -210,16 +210,19 @@ void ESP8266MMB::addXWWWFormUrlencodedParameter(char *offset, char *value) { //x
 }
 
 //---LETTURA DELLA RISPOSTA
-int ESP8266MMB::available() {
-	return _http.available();
-}
+// int ESP8266MMB::available() {
+// 	return _http.available();
+// }
 
-int ESP8266MMB::read() {
-	return _http.read();
-}
+// int ESP8266MMB::read() {
+// 	return _http.read();
+// }
 
-void ESP8266MMB::close() {
-	return _http.stop();
+// void ESP8266MMB::close() {
+// 	return _http.stop();
+// }
+String ESP8266MMB::getResponse() {
+	return _http.getString();
 }
 
 //---ESECUZIONE API (CHIAMATA HTTP)
@@ -271,6 +274,8 @@ int ESP8266MMB::run() {
 //---EXECUTE
 int ESP8266MMB::execute(char *url) {
 
+	int httpCode = 0;
+
 	#ifdef DEBUG
 		debugPrint(F("\nURL: "));
 		debugPrint(url);
@@ -279,69 +284,49 @@ int ESP8266MMB::execute(char *url) {
 		debugPrint(F("\n"));
 	#endif
 
-	int status = 0;
+	//---START REQUEST
+	_http.begin(MMB_API_HOSTNAME, MMB_API_PORT, url); //HTTP
 
 	if (_xWWWFormUrlencoded[0] != 0) { //chiamata POST (con body)
 
-		//---BEGIN REQUEST
-		_http.beginRequest();
-
-		//---MAKE POST REQUEST
-		status = _http.post(MMB_API_HOSTNAME, url);
-
-		//---SEND HEADER
-		_http.sendHeader("Content-Type",  "application/x-www-form-urlencoded");
-		_http.sendHeader("Content-Length", strlen(_xWWWFormUrlencoded));
-
-		//---END REQUEST
-		_http.endRequest();
-
-		//---PRINT STATUS CODE
-		#ifdef DEBUG
-			debugPrint(F("BODY: "));
-			debugPrint(_xWWWFormUrlencoded);
-			debugPrint(F("\n"));
-			debugPrint(F("BODY SIZE: "));
-			debugPrint(String(strlen(_xWWWFormUrlencoded)));
-			debugPrint(F("\n"));
-			debugPrint(F("\n"));
-		#endif
-
-		//---SEND BODY
-		_http.println(_xWWWFormUrlencoded);
+		//ricopio il body in un array di uint8_t
+		uint8_t payload_uint8_t[strlen(_xWWWFormUrlencoded)];
+		memcpy(payload_uint8_t, _xWWWFormUrlencoded, strlen(_xWWWFormUrlencoded));
+        
+        //---CHIAMATA POST
+		httpCode = _http.POST(payload_uint8_t, strlen(_xWWWFormUrlencoded));
 
 	} else { //non esistono parametri da inviare nel body della richiesta (GET)
 
-		status = _http.get(MMB_API_HOSTNAME, url); //eseguo la richiesta e salvo lo status code
+		//---CHIAMATA GET
+		httpCode = _http.GET();
 	}
 
-	if (status == 0) {
 
-		//---PRINT STATUS CODE
+
+	if (httpCode == 200) { //se la chiamata è andata a buon fine
+
 		#ifdef DEBUG
-			debugPrint(F("SUCCESS!\n"));
-			status = _http.responseStatusCode();
+			debugPrint(F("\nSUCCESS!\n"));
 			debugPrint(F("STATUS CODE: "));
-			debugPrint(String(status));
+			debugPrint(String(httpCode));
 			debugPrint(F("\n"));
 			debugPrint(F("\n"));
 		#endif
 
-		//skip ResponseHeader
-		_http.skipResponseHeaders();
+		return MMB_HTTP_SUCCESS;
 
 	} else {
 
-		//---PRINT ERROR
 		#ifdef DEBUG
-			debugPrint(F("ERROR!\n"));
+			debugPrint(F("\nERROR!\n"));
 			debugPrint(F("ERROR: "));
-			debugPrint(String(status));
+			debugPrint(String(httpCode));
 			debugPrint(F("\n"));
 			debugPrint(F("\n"));
 		#endif
 
-		return status; //ritorno il codice di errore
+		return MMB_HTTP_ERROR;
 	}
 
 }
@@ -370,7 +355,7 @@ void ESP8266MMB::buildApiURL(char *url) {
 }
 
 //costruisce e restituisce un parametro query string
-void ESP8266MMB::buildUrlencodedParameter(char *str, char *offset, char *value) {
+void ESP8266MMB::buildUrlencodedParameter(char *str, const char *offset, const char *value) {
 
 	//eseguo l'ulrencode dei parametri e li inserisco
 	//inserisco il parametro 
@@ -385,7 +370,7 @@ void ESP8266MMB::buildUrlencodedParameter(char *str, char *offset, char *value) 
 }
 
 //---URLENCODE
-void ESP8266MMB::urlencode(char *dst,char *src) { //esegue l'urlencode della stringa
+void ESP8266MMB::urlencode(char *dst, const char *src) { //esegue l'urlencode della stringa
 	char c,*d = dst;
 	while (c = *src++) {  
 		if (strchr(_specialCharacters, c)) {  
@@ -398,7 +383,7 @@ void ESP8266MMB::urlencode(char *dst,char *src) { //esegue l'urlencode della str
 	*d = '\0';
 }
 
-int ESP8266MMB::countCharacterToUrlencode(char *str) { //conta il numero di caratteri da convertire
+int ESP8266MMB::countCharacterToUrlencode(const char *str) { //conta il numero di caratteri da convertire
 	char c;
 	int n = 0;
 
